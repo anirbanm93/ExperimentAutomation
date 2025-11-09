@@ -147,6 +147,120 @@ class RFGEN:
 
         self.rfgen.flushInput()
 
+    def set_pwr(self, pwr: float) -> None:
+        """
+        Set generator output power.
+
+        Parameters
+        ----------
+        pwr : float
+            Output power in dBm (e.g., 10 for +10 dBm).
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If `pwr` are not valid ranges supported by device.
+        serial.SerialException
+            If the serial connection is not established.
+
+        Notes
+        -----
+        - Set power in dBm.
+        - Set power before setting the frequency.
+
+        Example
+        -------
+        rf.set_pwr(10)  # Set 10 dBm
+        """
+        if not self.rfgen or not self.rfgen.is_open:
+            raise serial.SerialException("RF generator is not connected. Call connect() first.")
+
+        self.rfgen.write(str.encode(f"W{pwr}"))  # Set power
+        # print(f"Power input: {pwr:0.2f} dBm")
+
+    def set_freq(self, freq: float) -> None:
+        """
+        Set generator output frequency.
+
+        Parameters
+        ----------
+        freq : float
+            Frequency in Hz to set the RF generator.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If `freq` are not valid ranges supported by device.
+        serial.SerialException
+            If the serial connection is not established.
+
+        Notes
+        -----
+        - Frequency is converted to MHz for generator commands.
+        - Flushes input buffer after setting parameters.
+
+        Example
+        -------
+        rf.set_freq(60e6)  # Set 60 MHz
+        """
+        if not self.rfgen or not self.rfgen.is_open:
+            raise serial.SerialException("RF generator is not connected. Call connect() first.")
+
+        self.rfgen.write(str.encode(f"f{freq * 1e-06}"))  # Set frequency
+        # print(f"Frequency: {freq * 1e-06:0.4f} MHz")
+
+        self.rfgen.flushInput()
+
+    def set_pwr_freq(self, pwr: float, freq: float) -> None:
+        """
+        Set generator output power and frequency.
+
+        Parameters
+        ----------
+        pwr : float
+            Output power in dBm (e.g., 10 for +10 dBm).
+        freq : float
+            Frequency in Hz to set the RF generator.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If `pwr` or `freq` are not valid ranges supported by device.
+        serial.SerialException
+            If the serial connection is not established.
+
+        Notes
+        -----
+        - Frequency is converted to MHz for generator commands.
+        - Flushes input buffer after setting parameters.
+
+        Example
+        -------
+        rf.set_pwr_freq(10, 60e6)  # Set 10 dBm at 60 MHz
+        """
+        if not self.rfgen or not self.rfgen.is_open:
+            raise serial.SerialException("RF generator is not connected. Call connect() first.")
+
+        self.rfgen.write(str.encode(f"W{pwr}"))  # Set power
+        # print(f"Power input: {pwr:0.2f} dBm")
+
+        self.rfgen.write(str.encode(f"f{freq * 1e-06}"))  # Set frequency
+        # print(f"Frequency: {freq * 1e-06:0.4f} MHz")
+
+        self.rfgen.flushInput()
+
     def disconnect(self) -> None:
         """
         Disable RF output and close the serial connection.
