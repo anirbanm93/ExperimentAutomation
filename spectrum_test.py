@@ -179,13 +179,18 @@ class SpectrumTest:
         >>> duration, data = test.collect_spectra()
         >>> print(f"Collected {data.shape} spectra in {duration:.2f} s")
         """
+        # RF lock time = 4 ms for RF generator
+        lock_time = 10e-03  # 10 ms
+
         data = []
         start = time.time()
 
         for pwr_in in self.pwr_in:
+            self.rfgen.set_pwr(pwr=pwr_in)
             row = []
             for f_in in self.f_in:
-                self.rfgen.set_pwr_freq(pwr=pwr_in, freq=f_in)
+                self.rfgen.set_freq(freq=f_in)
+                time.sleep(lock_time)
                 row.append(self.rfsa.capture_spectrum())
             data.append(row)
 
@@ -326,13 +331,12 @@ class SpectrumTest:
                 savefilename += ".h5"
             output_h5_file = savepath / savefilename
 
-            # --- Check if file already exists ---
-            if output_h5_file.exists():
-                timestamp = datetime.now().strftime("_%Y%m%d_%H%M%S")
-                output_h5_file = output_h5_file.with_name(
-                    f"{output_h5_file.stem}{timestamp}{output_h5_file.suffix}"
-                )
-                print(f"⚠️ File already exists. Saving as: {output_h5_file.name}")
+            # --- Always prepend timestamp to output filename ---
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_")
+            output_h5_file = output_h5_file.with_name(
+                f"{timestamp}{output_h5_file.name}"
+            )
+            print(f"💾 Saving output as: {output_h5_file.name}")
 
             with h5py.File(output_h5_file, "a") as f:
                 self._write_metadata_to_h5(f)
