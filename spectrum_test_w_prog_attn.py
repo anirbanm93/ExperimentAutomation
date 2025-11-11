@@ -190,7 +190,7 @@ class SpectrumTestwProgAttn:
 
         Notes
         -----
-        - Sets the attnuation value in dB.
+        - Sets the attenuation value in dB.
         - Calls the RF generator to set each power and frequency pair.
         - Uses the RFSA to capture spectra for each configuration.
         - Timing is measured to assess acquisition performance.
@@ -210,14 +210,16 @@ class SpectrumTestwProgAttn:
             Status = self.attn.Send_SCPI(f":SETATT={g_2}", "")  # Set attenuation
             Responses = self.attn.Send_SCPI(":ATT?", "")  # Read attenuation
             print(f"Set attenuation value: {Responses[1]} dB")
+            outer = []
             for pwr_in in self.pwr_in:
                 self.rfgen.set_pwr(pwr=pwr_in)
-                row = []
+                inner = []
                 for f_in in self.f_in:
                     self.rfgen.set_freq(freq=f_in)
                     time.sleep(lock_time)
-                    row.append(self.rfsa.capture_spectrum())
-                data.append(row)
+                    inner.append(self.rfsa.capture_spectrum())
+                outer.append(inner)   # ← wrap row inside a list for the middle dimension
+            data.append(outer)
 
         end = time.time()
         data = np.array(data, dtype=np.float64)  # shape: (len(g_2), len(pwr_in), len(f_in), trace_pts)
@@ -356,7 +358,7 @@ class SpectrumTestwProgAttn:
 
             # --- First measurement to discover array shape ---
             duration, first_data = self.collect_spectra()
-            arr_shape = first_data.shape  # shape: (len(pwr_in), len(f_in), trace_pts)
+            arr_shape = first_data.shape  # shape: (len(g_2), len(pwr_in), len(f_in), trace_pts)
 
             savepath = Path(savepath)
             savepath.mkdir(parents=True, exist_ok=True)
@@ -382,7 +384,7 @@ class SpectrumTestwProgAttn:
 
                 dset1 = grp.create_dataset(
                     "output_spectra",
-                    shape=(num_iters, arr_shape[0], arr_shape[1], arr_shape[2]),
+                    shape=(num_iters,) + arr_shape,
                     dtype=np.float64,
                     compression="gzip",
                     compression_opts=9,
@@ -459,3 +461,4 @@ if __name__ == "__main__":
             savefilename=f"spectrum_test_yig_s18_w_ampl_prog_attn_port1_to_2",
             num_iters=50,
             delay=2 * secs)
+
