@@ -5,6 +5,7 @@ The automation framework interfaces with multiple test and measurement instrumen
 * Digital Storage Oscilloscope (Rohde & Schwarz RTM3004)
 * RF Signal Generator (Windfreak SynthHD Pro V1.4)
 * RF Spectrum Analyzer (Tektronix RSA306B)
+* Programmable Attenuator (RCDAT-8000-30)
 
 The core modules, ModDemodTest and SpectrumTest, provide a unified workflow that:
 * Initialize and power on all connected instruments.
