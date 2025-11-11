@@ -1,4 +1,4 @@
-from __future__ import annotations
+# from __future__ import annotations
 import numpy as np
 import time
 import serial
@@ -461,4 +461,5 @@ if __name__ == "__main__":
             savefilename=f"spectrum_test_yig_s18_w_ampl_prog_attn_port1_to_2",
             num_iters=50,
             delay=2 * secs)
+
 
