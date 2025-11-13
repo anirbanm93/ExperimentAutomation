@@ -7,7 +7,7 @@ The automation framework interfaces with multiple test and measurement instrumen
 * RF Spectrum Analyzer (Tektronix RSA306B)
 * Programmable Attenuator (RCDAT-8000-30)
 
-The core modules, ModDemodTest and SpectrumTest, provide a unified workflow that:
+The core modules provide a unified workflow that:
 * Initialize and power on all connected instruments.
 * Configure each device according to the specified experimental parameters.
 * Automate waveform generation, temporal trace measurement, and spectrum acquisition.
